@@ -7,7 +7,6 @@ import 'package:flutter/services.dart'; // Importez ce service pour le mode pays
 import 'package:audioplayers/audioplayers.dart'; // Importez le package audioplayers
 
 // Assurez-vous d'importer votre fichier splash screen si vous l'avez séparé.
-// Si GameScreen est dans un autre fichier (ex: game_screen.dart), importez-le aussi.
 import 'splash_screen.dart'; // <-- IMPORT DU FICHIER SPLASH SCREEN
 
 void main() {
@@ -20,7 +19,6 @@ void main() {
     DeviceOrientation.landscapeRight,
   ]);
   // --- FIN DU CODE À AJOUTER ---
-
 
   runApp(const MyApp()); // Votre application démarre normalement après avoir réglé l'orientation.
 }
@@ -60,15 +58,15 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateMixin {
   // --- Variables pour le DEPLACEMENT et la logique du jeu ---
 
-  // Positions actuelles des animaux (axe X, de gauche à droite). Commencent à 0.0.
+  // Positions actuelles des animaux (axe X, de gauche à droite).
   double _lionPositionX = 0.0;
-  double _warthogPositionX = 0.0;
+  double _warthogPositionX = 0.0; // Sera calculé dans initState
 
   // Plages de vitesses de DEPLACEMENT possibles (pixels par "tick" de l'AnimationController)
-  final double _minLionSpeed = 0.1;
-  final double _maxLionSpeed = 0.4;
-  final double _minWarthogSpeed = 0.15; // Peut-être un peu plus rapide en moyenne
-  final double _maxWarthogSpeed = 0.5;
+  final double _minLionSpeed = 1.3;
+  final double _maxLionSpeed = 0.7;
+  final double _minWarthogSpeed = 0.4; // Peut-être un peu plus rapide en moyenne
+  final double _maxWarthogSpeed = 0.9;
 
   // Vitesses de DEPLACEMENT actuelles (définies aléatoirement au début de CHAQUE course)
   double _currentLionSpeed = 0.0;
@@ -80,8 +78,8 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   // Variable pour l'angle de rotation du phacochère (en radians). 0 = pas tourné. Utilisé à la fin.
   double _warthogRotationAngle = 0.0;
 
-  // Position de la grotte (ligne d'arrivée). Sera calculée en fonction de la largeur de l'écran.
-  double _caveEntranceX = 0.0;
+  // Position de la grotte (ligne d'arrivée). Sera calculée dans initState.
+  double _caveEntranceX = 1.0;
 
   // Variables pour gérer l'état du jeu (commencé, terminé, message de résultat).
   bool _isGameStarted = false;
@@ -96,18 +94,37 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     'assets/images/lion_run_1.webp', // <-- VOTRE PREMIER FICHIER WEBP
     'assets/images/lion_run_2.webp', // <-- VOTRE DEUXIÈME FICHIER WEBP
     'assets/images/lion_run_3.webp', // <-- VOTRE TROISIÈME FICHIER WEBP
+    'assets/images/lion_run_4.webp', // <-- VOTRE TROISIÈME FICHIER WEBP
+    'assets/images/lion_run_5.webp', // <-- VOTRE TROISIÈME FICHIER WEBP
+    'assets/images/lion_run_6.webp', // <-- VOTRE TROISIÈME FICHIER WEBP
+    'assets/images/lion_run_7.webp', // <-- VOTRE TROISIÈME FICHIER WEBP
+    'assets/images/lion_run_8.webp', // <-- VOTRE TROISIÈME FICHIER WEBP
+    'assets/images/lion_run_9.webp', // <-- VOTRE TROISIÈME FICHIER WEBP
+    'assets/images/lion_run_10.webp', // <-- VOTRE TROISIÈME FICHIER WEBP
+    'assets/images/lion_run_11.webp', // <-- VOTRE TROISIÈME FICHIER WEBP
+    'assets/images/lion_run_12.webp', // <-- VOTRE TROISIÈME FICHIER WEBP
     // Si vous avez plus de 3 frames, ajoutez les chemins ici.
   ];
 
-   // Liste des chemins vers les images pour l'animation de course du phacochère.
+    // Liste des chemins vers les images pour l'animation de course du phacochère.
   // REMPLACEZ CES CHEMINS SI VOS NOMS DE FICHIERS SONT DIFFÉRENTS !
   final List<String> _warthogRunFrames = [
-      'assets/images/warthog_run_1.webp', // <-- VOTRE PREMIER FICHIER WEBP
-      'assets/images/warthog_run_2.webp', // <-- VOTRE DEUXIÈME FICHIER WEBP
-      'assets/images/warthog_run_3.webp', // <-- VOTRE TROISIÈME FICHIER WEBP (à ajouter dans pubspec.yaml)
+     // 'assets/images/warthog_run_1.webp', // <-- VOTRE PREMIER FICHIER WEBP
+     // 'assets/images/warthog_run_2.webp', // <-- VOTRE DEUXIÈME FICHIER WEBP
+     // 'assets/images/warthog_run_3.webp', // <-- VOTRE TROISIÈME FICHIER WEBP (à ajouter dans pubspec.yaml)
+     // 'assets/images/warthog_run_4.webp', // <-- VOTRE QUATRIÈME FICHIER WEBP (à ajouter dans pubspec.yaml)
+      'assets/images/warthog_run_1.webp', // <-- VOTRE QUATRIÈME FICHIER WEBP (à ajouter dans pubspec.yaml)
+      'assets/images/warthog_run_2.webp', // <-- VOTRE QUATRIÈME FICHIER WEBP (à ajouter dans pubspec.yaml)
+      'assets/images/warthog_run_3.webp', // <-- VOTRE QUATRIÈME FICHIER WEBP (à ajouter dans pubspec.yaml)
       'assets/images/warthog_run_4.webp', // <-- VOTRE QUATRIÈME FICHIER WEBP (à ajouter dans pubspec.yaml)
-      'assets/images/warthog_run_5.webp', // <-- VOTRE CINQUIÈME FICHIER WEBP (à ajouter dans pubspec.yaml)
-      'assets/images/warthog_run_6.webp', // <-- VOTRE SIXIÈME FICHIER WEBP (à ajouter dans pubspec.yaml)
+      'assets/images/warthog_run_5.webp', // <-- VOTRE QUATRIÈME FICHIER WEBP (à ajouter dans pubspec.yaml)
+      'assets/images/warthog_run_6.webp', // <-- VOTRE QUATRIÈME FICHIER WEBP (à ajouter dans pubspec.yaml)
+      'assets/images/warthog_run_7.webp', // <-- VOTRE QUATRIÈME FICHIER WEBP (à ajouter dans pubspec.yaml)
+      'assets/images/warthog_run_8.webp', // <-- VOTRE QUATRIÈME FICHIER WEBP (à ajouter dans pubspec.yaml)
+      'assets/images/warthog_run_9.webp', // <-- VOTRE QUATRIÈME FICHIER WEBP (à ajouter dans pubspec.yaml)
+      'assets/images/warthog_run_10.webp', // <-- VOTRE QUATRIÈME FICHIER WEBP (à ajouter dans pubspec.yaml)
+      'assets/images/warthog_run_11.webp', // <-- VOTRE QUATRIÈME FICHIER WEBP (à ajouter dans pubspec.yaml)
+      'assets/images/warthog_run_12.webp', // <-- VOTRE QUATRIÈME FICHIER WEBP (à ajouter dans pubspec.yaml)
       // Si vous avez plus ou moins de frames, AJUSTEZ cette liste et pubspec.yaml.
   ];
 
@@ -130,20 +147,13 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   static const double _warthogWidth = 90.0; // Largeur du phacochère utilisée dans Image.asset (AJUSTEZ SI CHANGÉE)
   static const double _warthogHeight = 90.0; // Hauteur du phacochère
 
+  // Constante pour l'espace initial entre le lion et le phacochère au départ
+  static const double _espaceInitial = 80.0; // Espace entre lion et phacochère au départ (AJUSTEZ cette valeur si besoin)
+
 
   // --- Variables pour la gestion Audio ---
   // Instance du lecteur audio
-  final _audioPlayer = AudioPlayer();
-
-  // Liste des musiques disponibles. Associe un nom affiché à l'utilisateur au chemin de l'asset.
-  final List<Map<String, String>> _musicTracks = [
-    {'name': 'Musique Thème Course', 'path': 'assets/audio/music1.mp3'}, // <-- CORRIGÉ : Chemin complet
-    {'name': 'Ambiance Jungle', 'path': 'assets/audio/music2.mp3'},    // <-- REMPLACEZ LE CHEMIN ET LE NOM
-    // Ajoutez d'autres musiques ici si vous en avez
-  ];
-
-  // Variable pour stocker le chemin de la musique sélectionnée par l'utilisateur. Null au début.
-  String? _selectedMusicTrack;
+  final _audioPlayer = AudioPlayer(); // <-- GARDEZ CELLE-CI
 
 
   // Contrôleur principal de l'animation pour le DEPLACEMENT horizontal.
@@ -167,6 +177,21 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     // Met le lecteur en mode boucle pour la musique de fond.
     _audioPlayer.setReleaseMode(ReleaseMode.loop);
 
+    // --- CALCUL ET DÉFINITION DES POSITIONS INITIALES LORSQUE L'ÉCRAN EST CRÉÉ ---
+    // On utilise addPostFrameCallback pour s'assurer que le contexte a une taille et que MediaQuery fonctionne.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+       final screenWidth = MediaQuery.of(context).size.width;
+       // Calculer la position de la grotte (ligne d'arrivée).
+       _caveEntranceX = screenWidth * 0.87; // Exemple: 80% de la largeur (AJUSTEZ SELON VOTRE IMAGE DE FOND)
+
+       // Définir les positions de départ pour que les animaux soient corrects AVANT le clic.
+       _lionPositionX = 0.0; // Lion commence à l'extrême gauche (X = 0)
+       _warthogPositionX = _lionPositionX + _lionWidth + _espaceInitial; // Phacochère commence après le lion
+
+       // Met à jour l'UI pour afficher les animaux dans leurs positions initiales correctes.
+       setState(() {});
+    });
+
 
     // --- Ajout du listener de l'AnimationController (votre boucle de jeu principale pour le DEPLACEMENT) ---
     _controller.addListener(() {
@@ -180,18 +205,18 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
         _warthogPositionX += _currentWarthogSpeed;
 
         // Calculer la position de la grotte (assurez-vous que ce calcul est cohérent avec le build).
-        // En mode paysage, screenWidth est la grande dimension. Ajustez le facteur 0.8 si besoin.
-        final screenWidth = MediaQuery.of(context).size.width;
-        final double currentCaveEntranceX = screenWidth * 0.8; // Exemple: 80% de la largeur (ajustez)
+        // On réutilise _caveEntranceX calculé dans addPostFrameCallback.
+        //final screenWidth = MediaQuery.of(context).size.width; // Pas besoin de recalculer ici
+        //final double currentCaveEntranceX = screenWidth * 0.8; // Pas besoin de recalculer ici
 
         // 2. Vérifier les conditions de fin de jeu.
         // On commence par vérifier si le phacochère atteint la grotte.
-        if (_warthogPositionX >= currentCaveEntranceX) {
+        if (_warthogPositionX >= _caveEntranceX) { // Utilise _caveEntranceX calculé dans initState
           _isGameEnded = true; // Marque le jeu comme terminé.
           _gameResult = "Le phacochère a atteint la grotte et est en sécurité !"; // Définit le message du résultat.
           _controller.stop(); // Arrête la boucle d'animation de DEPLACEMENT.
 
-          _warthogRotationAngle = pi / 2; // <-- Logique de l'étape 8: Faire tourner le phacochère (ajustez l'angle si besoin).
+          _warthogRotationAngle = pi; // <-- CORRIGÉ : Tourner de 180 degrés (pi) pour regarder en arrière
 
           _spriteTimer?.cancel(); // <-- ARRÊTE LE TIMER DES SPRITES ICI !
           _audioPlayer.stop(); // <-- ARRÊTE LA MUSIQUE !
@@ -213,8 +238,8 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
 
           setState(() {}); // Met à jour l'interface (affiche le résultat, fige les positions et la frame du lion/phacochère)
         } else {
-           // Si le jeu est en cours ET PAS terminé...
-           setState(() {});
+            // Si le jeu est en cours ET PAS terminé...
+            setState(() {});
         }
       }
       // Si le jeu n'est pas commencé ou s'il est terminé, le code dans ce "if" n'est pas exécuté.
@@ -243,12 +268,14 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     // Obtenir la largeur de l'écran pour aider à positionner des éléments comme la grotte.
     // En mode paysage, screenWidth est la dimension la plus grande.
-    final screenWidth = MediaQuery.of(context).size.width;
+    // final screenWidth = MediaQuery.of(context).size.width; // Déjà fait dans initState
+
     // Calculer la position de la grotte (ligne d'arrivée).
     // Ici, on la met à 80% de la largeur de l'écran. Ajustez cette valeur (_caveEntranceX)
     // en fonction de l'emplacement exact de la grotte dans votre image de fond !
     // Assurez-vous que cette valeur est cohérente avec le calcul fait dans le listener.
-    _caveEntranceX = screenWidth * 0.8; // Exemple: 80% de la largeur (AJUSTEZ SELON VOTRE IMAGE DE FOND)
+    // _caveEntranceX est maintenant calculé dans initState.
+
 
     return Scaffold( // Un Scaffold fournit une structure d'application de base (AppBar, body)
       appBar: AppBar(
@@ -274,7 +301,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
               // avec _caveEntranceX, et non pas le bord gauche de l'image.
               // Par exemple: left: _caveEntranceX - largeur_image_grotte / 2
               // Commencez simple, puis ajustez visuellement.
-              left: _caveEntranceX, // Point de départ pour le positionnement X (AJUSTEZ SI BESOIN APRÈS AVOIR RÉGLÉ TAILLE/BOTTOM)
+              left: _caveEntranceX, // Utilise _caveEntranceX calculé dans initState
 
               // Ajustez bottom et height pour que la grotte soit bien posée sur le sol et ait la bonne taille.
               // En mode paysage, la hauteur de l'écran est plus petite, ajustez 'bottom' et 'height' si besoin.
@@ -282,8 +309,8 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
 
               child: Image.asset(
                 'assets/images/cave.png', // <-- REMPLACEZ PAR LE CHEMIN DE VOTRE IMAGE DE GROTTE
-                 width: 120, // <-- AJUSTEZ CETTE LARGEUR SELON VOTRE IMAGE
-                 height: 150, // <-- AJUSTEZ CETTE HAUTEUR SELON VOTRE IMAGE
+                  width: 210, // <-- AJUSTEZ CETTE LARGEUR SELON VOTRE IMAGE
+                  height: 250, // <-- AJUSTEZ CETTE HAUTEUR SELON VOTRE IMAGE
                 fit: BoxFit.contain, // ou BoxFit.fill si vous spécifiez width/height
               ),
           ),
@@ -305,93 +332,62 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
 
           // --- Image du phacochère (maintenant animée par sprites) ---
           // Assurez-vous que les frames sont dans assets/images/ et déclarées dans pubspec.yaml
-           Positioned(
-            left: _warthogPositionX, // <-- Position horizontale gérée par _warthogPositionX
-            bottom: 50, // Ajustez si besoin pour qu'il soit sur le "sol" (probablement la même que le lion)
-             // Enveloppé par Transform.rotate pour l'étape 8 (rotation à la fin)
+            Positioned(
+             left: _warthogPositionX, // <-- Position horizontale gérée par _warthogPositionX
+             bottom: 50, // Ajustez si besoin pour qu'il soit sur le "sol" (probablement la même que le lion)
+              // Enveloppé par Transform.rotate pour l'étape 8 (rotation à la fin)
             child: Transform.rotate(
-               angle: _warthogRotationAngle, // Utilise la variable d'état pour l'angle (0 par défaut, change à la fin pour le phacochère)
-               // Optional: origin: Offset(45, 45), // Point de pivot si vous voulez (ajustez pour le centre de votre image de phacochère)
-               child: Image.asset(
+                angle: _warthogRotationAngle, // Utilise la variable d'état pour l'angle (0 par défaut, change à la fin pour le phacochère)
+                // Optional: origin: Offset(45, 45), // Point de pivot si vous voulez (ajustez pour le centre de votre image de phacochère)
+                child: Image.asset(
                 // Utilise l'image de la liste _warthogRunFrames correspondant à l'index actuel (_currentWarthogFrameIndex).
                 _warthogRunFrames[_currentWarthogFrameIndex], // <-- UTILISE L'IMAGE ANIMÉE DU PHACOCHÈRE
                 width: _warthogWidth, // <-- Utilise la constante pour la largeur
                 height: _warthogHeight, // <-- Utilise la constante pour la hauteur
                 fit: BoxFit.contain,
-               ),
+                ),
             ),
           ),
 
-          // --- Écran d'accueil/fin de jeu (avec bouton et choix musical) ---
+          // --- Écran d'accueil/fin de jeu (avec bouton UNIQUEMENT) ---
           // Visible si le jeu n'est pas commencé OU s'il est terminé.
           if (!_isGameStarted || _isGameEnded)
             Positioned.fill( // Remplir tout l'espace pour centrer le contenu
               child: Container(
-                 color: Colors.black54, // Optionnel: un fond sombre pour mieux voir les contrôles
-                 child: Center( // Centrer le contenu verticalement et horizontalement
-                   child: Column( // Organise les éléments verticalement
-                     mainAxisAlignment: MainAxisAlignment.center, // Centrer les éléments de la colonne
-                     children: [
+                  color: Colors.black54, // Optionnel: un fond sombre pour mieux voir les contrôles
+                  child: Center( // Centrer le contenu verticalement et horizontalement
+                    child: Column( // Organise les éléments verticalement
+                      mainAxisAlignment: MainAxisAlignment.center, // Centrer les éléments de la colonne
+                      children: [
 
-                       // --- Affichage du résultat (seulement si le jeu est terminé) ---
-                       if (_isGameEnded)
-                         Padding(
-                           padding: const EdgeInsets.only(bottom: 20.0), // Espace sous le texte du résultat
-                           child: Text(
-                             _gameResult,
-                             style: const TextStyle(
-                               fontSize: 24,
-                               color: Colors.white,
-                               fontWeight: FontWeight.bold,
-                             ),
-                             textAlign: TextAlign.center,
-                           ),
-                         ),
+                        // --- Affichage du résultat (seulement si le jeu est terminé) ---
+                        if (_isGameEnded)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 20.0), // Espace sous le texte du résultat
+                            child: Text(
+                              _gameResult,
+                              style: const TextStyle(
+                                fontSize: 24,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
 
-                       // --- Interface de sélection de la musique (visible si pas commencé ou terminé) ---
-                       // L'utilisateur choisit ici.
-                       Container( // Optionnel: Conteneur pour donner une largeur max au Dropdown
-                         width: 250,
-                         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-                         decoration: BoxDecoration(
-                            color: Colors.white70, // Fond semi-transparent pour le Dropdown
-                            borderRadius: BorderRadius.circular(8.0),
-                         ),
-                         child: DropdownButtonHideUnderline( // Cache la ligne sous le bouton
-                           child: DropdownButton<String>(
-                             hint: const Text('Choisir une musique'), // Texte affiché si rien n'est sélectionné
-                             value: _selectedMusicTrack, // La valeur sélectionnée actuellement
-                             items: _musicTracks.map((track) { // Crée la liste des options à partir de _musicTracks
-                               return DropdownMenuItem<String>(
-                                 value: track['path'], // La valeur réelle est le chemin du fichier
-                                 child: Text(track['name']!), // Le texte affiché est le nom de la musique
-                               );
-                             }).toList(),
-                             onChanged: (String? newValue) { // Appelé quand l'utilisateur sélectionne une option
-                               setState(() {
-                                 _selectedMusicTrack = newValue; // Met à jour la musique sélectionnée
-                               });
-                             },
-                              // Personnalisation visuelle (optionnel)
-                             style: const TextStyle(color: Colors.black, fontSize: 16),
-                             dropdownColor: Colors.white, // Couleur du menu déroulant
-                             icon: const Icon(Icons.arrow_downward, color: Colors.black),
-                           ),
-                         ),
-                       ),
+                        // --- Bouton Démarrer / Rejouer ---
+                        ElevatedButton(
+                           onPressed: () {
+                             // --- LOGIQUE POUR DÉMARRER LA MUSIQUE ET LE JEU ---
+                             print('Bouton Démarrer cliqué !'); // <-- KEEP PRINT
 
-                       const SizedBox(height: 20), // Espace entre le sélecteur et le bouton
-
-                       // --- Bouton Démarrer / Rejouer ---
-                       ElevatedButton(
-                         onPressed: () {
-                           // --- LOGIQUE POUR DÉMARRER LA MUSIQUE SELECTIONNÉE ET LE JEU ---
-                           if (_selectedMusicTrack != null) { // Vérifie si une musique a été sélectionnée
                              // Arrête la musique actuelle si elle joue (utile si on rejoue)
                              _audioPlayer.stop();
-                             // Joue la musique sélectionnée depuis les assets.
-                             _audioPlayer.play(AssetSource(_selectedMusicTrack!));
-                             // L'AudioPlayer a déjà été configuré pour boucler dans initState.
+                             print('Ancienne musique arrêtée.'); // <-- KEEP PRINT
+                             // Joue directement la musique par défaut depuis les assets.
+                             // CORRIGÉ : Utilisez le chemin correct 'audio/musicX.mp3'
+                             _audioPlayer.play(AssetSource('audio/music1.mp3')); // <-- Vérifiez ce chemin EXACTEMENT
+                             print('Essai de lecture de audio/music1.mp3'); // <-- KEEP PRINT
 
                              // --- LOGIQUE DE DÉMARRAGE DU JEU (comme avant) ---
                              setState(() {
@@ -402,10 +398,10 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                                _warthogRotationAngle = 0.0;
 
                                // Réinitialise les positions au départ (lion derrière phacochère)
-                               _lionPositionX = 0.0;        // Lion commence à l'extrême gauche (X = 0)
-                               // Phacochère commence après le lion, avec un espace.
-                               final double espaceInitial = 80.0; // Espace entre lion et phacochère au départ (AJUSTEZ cette valeur si besoin)
-                               _warthogPositionX = _lionPositionX + _lionWidth + espaceInitial; // Calcule la position de départ du phacochère
+                               // Utilisez les mêmes calculs que dans initState pour la position de départ
+                               _lionPositionX = 0.0;
+                               _warthogPositionX = _lionPositionX + _lionWidth + _espaceInitial; // Recalcule la position de départ du phacochère
+
 
                                // Réinitialise les index des frames des pattes.
                                _currentLionFrameIndex = 0;
@@ -414,6 +410,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                                // Génère les vitesses de DEPLACEMENT aléatoires.
                                _currentLionSpeed = _minLionSpeed + _random.nextDouble() * (_maxLionSpeed - _minLionSpeed);
                                _currentWarthogSpeed = _minWarthogSpeed + _random.nextDouble() * (_maxWarthogSpeed - _minWarthogSpeed);
+                               print('setState pour démarrer le jeu exécuté.'); // <-- KEEP PRINT
                              }); // <-- Fin du setState
 
                              // --- INITIALISATION ET DÉMARRAGE DU TIMER DES SPRITES ---
@@ -421,32 +418,25 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                              _spriteTimer?.cancel();
                              // Crée et démarre un NOUVEAU timer pour cette partie.
                              _spriteTimer = Timer.periodic(_spriteFrameDuration, (timer) {
-                                if (_isGameStarted && !_isGameEnded) {
-                                  _currentLionFrameIndex = (_currentLionFrameIndex + 1) % _lionRunFrames.length;
-                                  _currentWarthogFrameIndex = (_currentWarthogFrameIndex + 1) % _warthogRunFrames.length;
-                                  setState(() {});
-                                }
+                                 if (_isGameStarted && !_isGameEnded) {
+                                     _currentLionFrameIndex = (_currentLionFrameIndex + 1) % _lionRunFrames.length;
+                                     _currentWarthogFrameIndex = (_currentWarthogFrameIndex + 1) % _warthogRunFrames.length;
+                                     setState(() {});
+                                 }
                              });
                              // --- FIN DE L'INITIALISATION ET DÉMARRAGE DU TIMER ---
 
 
                              // Démarre l'animation de DEPLACEMENT (AnimationController).
                              _controller.forward(from: 0.0);
-
-                           } else {
-                             // Si aucune musique n'est sélectionnée, afficher un message.
-                             ScaffoldMessenger.of(context).showSnackBar(
-                               const SnackBar(content: Text('Veuillez sélectionner une musique !')),
-                             );
-                           }
-                         },
-                         // Le texte du bouton change selon si le jeu est terminé ou non.
-                         child: Text(_isGameEnded ? 'Rejouer' : 'Démarrer la Course'),
-                       ),
-                     ],
-                   ),
-                 ),
-               ),
+                           },
+                           // Le texte du bouton change selon si le jeu est terminé ou non.
+                           child: Text(_isGameEnded ? 'Rejouer' : 'Démarrer la Course'),
+                         ),
+                      ],
+                    ),
+                  ),
+                ),
             ),
 
           // --- L'affichage du résultat précédent est maintenant géré DANS le Column ci-dessus ---

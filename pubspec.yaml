@@ -47,6 +47,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^3.0.0 # J'ai mis une version plus récente compatible, ajustez si besoin exact de 5.0.0
+  flutter_launcher_icons: "^0.13.1" # <-- AJOUTE CETTE LIGNE (utilise la dernière version stable si tu veux)
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -68,14 +69,32 @@ flutter:
     - assets/images/lion_run_1.webp
     - assets/images/lion_run_2.webp
     - assets/images/lion_run_3.webp
+    - assets/images/lion_run_4.webp
+    - assets/images/lion_run_5.webp
+    - assets/images/lion_run_6.webp
+    - assets/images/lion_run_7.webp
+    - assets/images/lion_run_8.webp
+    - assets/images/lion_run_9.webp
+    - assets/images/lion_run_10.webp
+    - assets/images/lion_run_11.webp
+    - assets/images/lion_run_12.webp
     # Ajoutez ici d'autres fichiers si vous en avez pour le phacochère animé, etc.
-    - assets/images/warthog_run_1.webp # <-- VOTRE PREMIER FICHIER WEBP
-    - assets/images/warthog_run_2.webp # <-- VOTRE DEUXIÈME FICHIER WEBP
+   # - assets/images/warthog_run_1.webp # <-- VOTRE PREMIER FICHIER WEBP
+    #- assets/images/warthog_run_2.webp # <-- VOTRE DEUXIÈME FICHIER WEBP
+    - assets/images/warthog_run_1.webp
+    - assets/images/warthog_run_2.webp
     - assets/images/warthog_run_3.webp
     - assets/images/warthog_run_4.webp
     - assets/images/warthog_run_5.webp
     - assets/images/warthog_run_6.webp
+    - assets/images/warthog_run_7.webp
+    - assets/images/warthog_run_8.webp
+    - assets/images/warthog_run_9.webp
+    - assets/images/warthog_run_10.webp
+    - assets/images/warthog_run_11.webp
+    - assets/images/warthog_run_12.webp
     - assets/images/cave.png # <-- AJOUTEZ LE CHEMIN DE VOTRE IMAGE DE GROTTE ICI
+    - assets/images/logo.webp
     #- assets/audio/
     - assets/audio/music1.mp3
     - assets/audio/music2.mp3
@@ -105,3 +124,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+  # ... fin de ton pubspec.yaml existant ...
+
+flutter_launcher_icons:
+  android: true # Générer l'icône pour Android
+  ios: true     # Générer l'icône pour iOS
+  image_path: "assets/images/icone.webp" # <-- REMPLACEZ PAR LE CHEMIN DE VOTRE IMAGE SOURCE
+  # min_sdk_android: 21 # Optionnel: le SDK minimum supporté (par défaut c'est 21)
